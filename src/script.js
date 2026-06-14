@@ -268,12 +268,6 @@ btnTrash.addEventListener('click', () => {
     }
 });
 
-btnMinimize.addEventListener('click', () => {
-    pomodoroSection.classList.toggle('mini-mode');
-    iconMinimize.classList.toggle('hidden');
-    iconMaximize.classList.toggle('hidden');
-});
-
 
 // --- TO-DO LIST LOGIC ---
 const todoForm = document.getElementById('todo-form');
@@ -290,18 +284,18 @@ function renderTodos() {
     todoList.innerHTML = '';
     todos.forEach((todo, index) => {
         const li = document.createElement('li');
-        li.className = 'flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-transparent hover:border-blue-200 transition group';
+        li.className = 'flex items-start justify-between p-4 bg-gray-50 rounded-xl border border-transparent hover:border-blue-200 transition group';
         
         li.innerHTML = `
-            <div class="flex items-center space-x-3">
+            <div class="flex items-start space-x-3 flex-grow min-w-0">
                 <input type="checkbox" ${todo.completed ? 'checked' : ''} 
-                    class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    class="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer flex-shrink-0"
                     onchange="toggleTodo(${index})">
-                <span class="${todo.completed ? 'line-through text-gray-400' : 'text-gray-700'} font-medium transition">
+                <span class="${todo.completed ? 'line-through text-gray-400' : 'text-gray-700'} font-medium transition break-words whitespace-normal overflow-hidden min-w-0">
                     ${todo.text}
                 </span>
             </div>
-            <button onclick="deleteTodo(${index})" class="text-gray-400 hover:text-red-500 transition opacity-0 group-hover:opacity-100">
+            <button onclick="deleteTodo(${index})" class="text-gray-400 hover:text-red-500 transition opacity-0 group-hover:opacity-100 flex-shrink-0 ml-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1-1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                 </svg>
@@ -335,7 +329,7 @@ window.deleteTodo = (index) => {
 };
 
 
-// --- FITUR 2: KALKULATOR & CATATAN (BARU) ---
+// --- FITUR 2: KALKULATOR & CATATAN ---
 
 // Kalkulator Logic
 const calcDisplay = document.getElementById('calc-display');
@@ -394,57 +388,89 @@ scratchpad.addEventListener('input', () => {
     localStorage.setItem('fokusaja-scratchpad', scratchpad.value);
 });
 
-// --- FITUR TOOLBOX TOGGLE (BARU) ---
+// --- FITUR TOOLBOX TOGGLE (UPDATE: INCLUDE TODO) ---
 window.toggleTool = (tool) => {
-    const calcPanel = document.getElementById('panel-calc');
-    const scratchPanel = document.getElementById('panel-scratch');
-    const calcBtn = document.getElementById('btn-toolbox-calc');
-    const scratchBtn = document.getElementById('btn-toolbox-scratch');
+    const panels = {
+        todo: document.getElementById('panel-todo'),
+        calc: document.getElementById('panel-calc'),
+        scratch: document.getElementById('panel-scratch')
+    };
+    const buttons = {
+        todo: document.getElementById('btn-toolbox-todo'),
+        calc: document.getElementById('btn-toolbox-calc'),
+        scratch: document.getElementById('btn-toolbox-scratch')
+    };
 
-    if (tool === 'calc') {
-        const isOpen = !calcPanel.classList.contains('hidden');
-        
-        // Tutup scratchpad (Mutually Exclusive)
-        scratchPanel.classList.add('hidden', 'opacity-0', 'scale-95');
-        scratchBtn.classList.remove('bg-blue-50', 'text-blue-600');
-        scratchBtn.classList.add('text-gray-400');
+    const targetPanel = panels[tool];
+    const isOpen = !targetPanel.classList.contains('hidden');
 
-        if (isOpen) {
-            calcPanel.classList.add('hidden', 'opacity-0', 'scale-95');
-            calcBtn.classList.remove('bg-blue-50', 'text-blue-600');
-            calcBtn.classList.add('text-gray-400');
-        } else {
-            calcPanel.classList.remove('hidden');
-            setTimeout(() => {
-                calcPanel.classList.remove('opacity-0', 'scale-95');
-            }, 10);
-            calcBtn.classList.add('bg-blue-50', 'text-blue-600');
-            calcBtn.classList.remove('text-gray-400');
-        }
-    } else if (tool === 'scratch') {
-        const isOpen = !scratchPanel.classList.contains('hidden');
-        
-        // Tutup kalkulator (Mutually Exclusive)
-        calcPanel.classList.add('hidden', 'opacity-0', 'scale-95');
-        calcBtn.classList.remove('bg-blue-50', 'text-blue-600');
-        calcBtn.classList.add('text-gray-400');
+    // Reset all panels and buttons
+    Object.keys(panels).forEach(key => {
+        panels[key].classList.add('hidden', 'opacity-0', 'scale-95');
+        buttons[key].classList.remove('bg-blue-50', 'text-blue-600');
+        buttons[key].classList.add('text-gray-400');
+    });
 
-        if (isOpen) {
-            scratchPanel.classList.add('hidden', 'opacity-0', 'scale-95');
-            scratchBtn.classList.remove('bg-blue-50', 'text-blue-600');
-            scratchBtn.classList.add('text-gray-400');
-        } else {
-            scratchPanel.classList.remove('hidden');
-            setTimeout(() => {
-                scratchPanel.classList.remove('opacity-0', 'scale-95');
-            }, 10);
-            scratchBtn.classList.add('bg-blue-50', 'text-blue-600');
-            scratchBtn.classList.remove('text-gray-400');
-        }
+    if (!isOpen) {
+        targetPanel.classList.remove('hidden');
+        setTimeout(() => {
+            targetPanel.classList.remove('opacity-0', 'scale-95');
+        }, 10);
+        buttons[tool].classList.add('bg-blue-50', 'text-blue-600');
+        buttons[tool].classList.remove('text-gray-400');
     }
 };
+
+// --- FITUR DRAGGABLE MINI TIMER (BARU) ---
+let isDragging = false;
+let offsetX, offsetY;
+
+pomodoroSection.addEventListener('mousedown', (e) => {
+    if (!pomodoroSection.classList.contains('mini-mode')) return;
+    
+    isDragging = true;
+    const rect = pomodoroSection.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+    
+    pomodoroSection.style.transition = 'none'; // Matikan transisi saat drag
+});
+
+document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    
+    const x = e.clientX - offsetX;
+    const y = e.clientY - offsetY;
+    
+    pomodoroSection.style.left = `${x}px`;
+    pomodoroSection.style.top = `${y}px`;
+    pomodoroSection.style.right = 'auto';
+    pomodoroSection.style.bottom = 'auto';
+});
+
+document.addEventListener('mouseup', () => {
+    if (isDragging) {
+        isDragging = false;
+        pomodoroSection.style.transition = 'all 0.3s ease'; // Kembalikan transisi
+    }
+});
+
+btnMinimize.addEventListener('click', () => {
+    const isMini = pomodoroSection.classList.toggle('mini-mode');
+    iconMinimize.classList.toggle('hidden');
+    iconMaximize.classList.toggle('hidden');
+    
+    // Reset posisi saat kembali ke mode normal
+    if (!isMini) {
+        pomodoroSection.style.left = '';
+        pomodoroSection.style.top = '';
+        pomodoroSection.style.right = '';
+        pomodoroSection.style.bottom = '';
+    }
+});
 
 
 // Initial Render
 updateDisplay();
 renderTodos();
+toggleTool('todo'); // Open To-Do List by default
