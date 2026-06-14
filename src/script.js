@@ -394,6 +394,56 @@ scratchpad.addEventListener('input', () => {
     localStorage.setItem('fokusaja-scratchpad', scratchpad.value);
 });
 
+// --- FITUR TOOLBOX TOGGLE (BARU) ---
+window.toggleTool = (tool) => {
+    const calcPanel = document.getElementById('panel-calc');
+    const scratchPanel = document.getElementById('panel-scratch');
+    const calcBtn = document.getElementById('btn-toolbox-calc');
+    const scratchBtn = document.getElementById('btn-toolbox-scratch');
+
+    if (tool === 'calc') {
+        const isOpen = !calcPanel.classList.contains('hidden');
+        
+        // Tutup scratchpad (Mutually Exclusive)
+        scratchPanel.classList.add('hidden', 'opacity-0', 'scale-95');
+        scratchBtn.classList.remove('bg-blue-50', 'text-blue-600');
+        scratchBtn.classList.add('text-gray-400');
+
+        if (isOpen) {
+            calcPanel.classList.add('hidden', 'opacity-0', 'scale-95');
+            calcBtn.classList.remove('bg-blue-50', 'text-blue-600');
+            calcBtn.classList.add('text-gray-400');
+        } else {
+            calcPanel.classList.remove('hidden');
+            setTimeout(() => {
+                calcPanel.classList.remove('opacity-0', 'scale-95');
+            }, 10);
+            calcBtn.classList.add('bg-blue-50', 'text-blue-600');
+            calcBtn.classList.remove('text-gray-400');
+        }
+    } else if (tool === 'scratch') {
+        const isOpen = !scratchPanel.classList.contains('hidden');
+        
+        // Tutup kalkulator (Mutually Exclusive)
+        calcPanel.classList.add('hidden', 'opacity-0', 'scale-95');
+        calcBtn.classList.remove('bg-blue-50', 'text-blue-600');
+        calcBtn.classList.add('text-gray-400');
+
+        if (isOpen) {
+            scratchPanel.classList.add('hidden', 'opacity-0', 'scale-95');
+            scratchBtn.classList.remove('bg-blue-50', 'text-blue-600');
+            scratchBtn.classList.add('text-gray-400');
+        } else {
+            scratchPanel.classList.remove('hidden');
+            setTimeout(() => {
+                scratchPanel.classList.remove('opacity-0', 'scale-95');
+            }, 10);
+            scratchBtn.classList.add('bg-blue-50', 'text-blue-600');
+            scratchBtn.classList.remove('text-gray-400');
+        }
+    }
+};
+
 
 // Initial Render
 updateDisplay();
