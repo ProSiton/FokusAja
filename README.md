@@ -1,45 +1,46 @@
 # FokusAja 🍅📝
 
-**FokusAja** adalah aplikasi produktivitas berbasis web sederhana yang menggabungkan metode *Pomodoro Timer* dengan *To-Do List*. Aplikasi ini dirancang untuk membantu Anda mengelola waktu dengan lebih efektif dan tetap fokus pada tugas-tugas harian Anda.
+**FokusAja** adalah aplikasi produktivitas berbasis web yang menggabungkan metode *Pomodoro Timer* dengan berbagai alat bantu seperti *To-Do List*, *Kalkulator*, dan *Scratchpad*. Dirancang untuk membantu Anda tetap fokus dan mengelola waktu dengan lebih efisien dalam satu tampilan terpadu.
 
 ## ✨ Fitur Utama
 
-- **Pomodoro Timer**:
-  - Mode Fokus (25 menit).
-  - Mode Istirahat Pendek (5 menit).
-  - Mode Istirahat Panjang (15 menit).
-  - Kontrol Mulai, Jeda, dan Reset yang intuitif.
-  - Notifikasi suara dan alert saat waktu habis.
-- **To-Do List**:
-  - Tambah tugas baru dengan mudah.
-  - Tandai tugas yang sudah selesai dengan checkbox.
-  - Hapus tugas yang tidak diperlukan.
-  - **Penyimpanan Lokal (localStorage)**: Daftar tugas Anda tetap tersimpan meskipun halaman di-refresh atau browser ditutup.
-- **Desain Modern & Responsif**: Tampilan bersih menggunakan Tailwind CSS yang menyesuaikan dengan berbagai ukuran layar (Desktop & Mobile).
+- **Pomodoro Timer Canggih**:
+  - **Sistem Antrian (Queue)**: Tambahkan beberapa sesi fokus sekaligus ke dalam antrian.
+  - **Sesi Kustom**: Atur nama dan durasi sesi sesuai kebutuhan Anda.
+  - **Mode Mini (Floating Widget)**: Ubah timer menjadi widget kecil yang dapat digeser (*draggable*) agar tetap terlihat saat Anda membuka jendela lain.
+  - **Alarm & Modal Notifikasi**: Notifikasi visual dan suara (Web Audio API) yang persisten saat waktu habis.
+- **Peralatan Produktivitas (Toolbox)**:
+  - **To-Do List**: Kelola daftar tugas dengan fitur tambah, centang, dan hapus. Data tersimpan otomatis di `localStorage`.
+  - **Kalkulator**: Kalkulator sederhana terintegrasi untuk perhitungan cepat tanpa meninggalkan aplikasi.
+  - **Scratchpad (Catatan Cepat)**: Area teks untuk mencatat ide atau pikiran mendadak agar tidak mengganggu fokus.
+- **Desain Modern & Responsif**: Menggunakan Tailwind CSS dengan font Inter, mendukung mode Desktop dan Mobile.
 
 ## 🚀 Teknologi yang Digunakan
 
-- **HTML5**: Struktur semantik untuk web.
-- **Tailwind CSS**: Styling modern melalui CDN tanpa perlu instalasi tambahan.
-- **Vanilla JavaScript**: Logika aplikasi murni untuk performa yang ringan.
-- **localStorage API**: Untuk penyimpanan data tugas secara lokal di browser.
+- **HTML5 & CSS3**: Struktur semantik dan styling kustom.
+- **Tailwind CSS**: Framework CSS utility-first untuk desain responsif.
+- **Vanilla JavaScript**: Logika aplikasi murni tanpa dependensi eksternal berat.
+- **Web Audio API**: Digunakan untuk menghasilkan suara alarm yang jernih secara programatis.
+- **localStorage API**: Menyimpan data tugas, catatan, dan preferensi pengguna secara lokal.
 
 ## 🛠️ Cara Penggunaan
 
-1. **Clone atau Download**: Unduh repositori ini atau salin file `index.html` dan `script.js`.
-2. **Jalankan**: Buka file `index.html` langsung di browser favorit Anda.
+1. **Clone atau Download**: Unduh repositori ini.
+2. **Jalankan**: Buka file `src/index.html` langsung di browser favorit Anda.
 3. **Mulai Fokus**:
-    - Pilih mode waktu (Fokus/Istirahat).
-    - Klik **Mulai** untuk menjalankan timer.
-    - Tambahkan daftar tugas di bagian bawah untuk melacak kemajuan Anda.
+    - Pilih preset waktu atau buat sesi kustom.
+    - Tambahkan ke antrian jika Anda memiliki beberapa tugas.
+    - Gunakan **Mode Mini** jika ingin timer tetap melayang di atas jendela lain.
+    - Manfaatkan **Toolbox** di sebelah kanan untuk membantu pekerjaan Anda.
 
 ## 📂 Struktur Folder
 
 ```text
 FokusAja/
-├── index.html    # Struktur UI dan layout
-├── script.js     # Logika Timer dan To-Do List
-└── README.md     # Dokumentasi proyek
+├── src/
+│   ├── index.html    # Struktur UI dan layout
+│   └── script.js     # Logika Timer, To-Do List, dan Peralatan
+└── README.md         # Dokumentasi proyek
 ```
 
 ## 📝 Lisensi
