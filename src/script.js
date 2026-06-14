@@ -1,12 +1,18 @@
 // --- POMODORO TIMER LOGIC ---
 let timerId = null;
 let timeLeft = 25 * 60; 
-let initialTimeForSession = 25 * 60; // Fitur 2: Simpan waktu awal sesi untuk Reset
+let initialTimeForSession = 25 * 60; 
 let isPaused = true;
+
+// Fitur 3: State Alarm & Modal
+let alarmOscillator = null;
+let audioCtx = null;
+const alarmModal = document.getElementById('alarm-modal');
+const btnModalOk = document.getElementById('btn-modal-ok');
 
 // Fitur 2: State Antrian
 let timerQueue = [];
-let currentQueueItem = { label: "Belajar", minutes: 25 }; // Default session
+let currentQueueItem = { label: "Belajar", minutes: 25 }; 
 
 // DOM Elements
 const timerDisplay = document.getElementById('timer-display');
@@ -32,7 +38,6 @@ const customNameContainer = document.getElementById('custom-name-container');
 const inputCustomName = document.getElementById('input-custom-name');
 let activeThemeLabel = "Belajar";
 
-// Fitur 1: Pisahkan state display dengan input
 function updateDisplay() {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
@@ -40,7 +45,6 @@ function updateDisplay() {
     timerDisplay.textContent = displayStr;
     document.title = `${displayStr} - FokusAja`;
     
-    // Fitur 4: Update Mini Mode Info
     const currentLabel = currentQueueItem ? currentQueueItem.label : 'Fokus';
     miniCurrentTask.textContent = `Saat ini: ${currentLabel}`;
     
@@ -52,20 +56,54 @@ function updateDisplay() {
     }
 }
 
-function playNotificationSound() {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioCtx.createOscillator();
+// Fitur 3: Sistem Alarm Persisten (Web Audio API)
+function startAlarm() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Buzzer sound using square wave
+    alarmOscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); 
-    oscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.5); 
-    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
-    oscillator.connect(gainNode);
+    
+    alarmOscillator.type = 'square';
+    alarmOscillator.frequency.setValueAtTime(440, audioCtx.currentTime); 
+    
+    // Create a beeping effect
+    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+    for (let i = 0; i < 60; i += 0.5) {
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime + i);
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime + i + 0.25);
+    }
+    
+    alarmOscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 1);
+    alarmOscillator.start();
 }
+
+function stopAlarm() {
+    if (alarmOscillator) {
+        alarmOscillator.stop();
+        alarmOscillator = null;
+    }
+}
+
+function showAlarmModal() {
+    alarmModal.classList.remove('hidden');
+    setTimeout(() => {
+        alarmModal.classList.remove('opacity-0');
+        alarmModal.querySelector('div').classList.remove('scale-95');
+    }, 10);
+    startAlarm();
+}
+
+btnModalOk.addEventListener('click', () => {
+    stopAlarm();
+    alarmModal.classList.add('opacity-0');
+    alarmModal.querySelector('div').classList.add('scale-95');
+    setTimeout(() => {
+        alarmModal.classList.add('hidden');
+        startNextInQueue(); // Lanjut ke antrian berikutnya setelah OK
+    }, 300);
+});
 
 function updateQueueUI() {
     if (timerQueue.length === 0) {
@@ -107,7 +145,6 @@ function startNextInQueue() {
         startTimer();
     } else {
         currentQueueItem = null;
-        // Reset ke nilai input jika antrian habis
         const mins = parseInt(inputMinutes.value) || 25;
         timeLeft = mins * 60;
         initialTimeForSession = timeLeft;
@@ -116,7 +153,6 @@ function startNextInQueue() {
     }
 }
 
-// Fitur 5: Tema & Kustom
 themeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         themeBtns.forEach(b => {
@@ -143,7 +179,6 @@ btnAddQueue.addEventListener('click', () => {
     const minutes = parseInt(inputMinutes.value) || 1;
     let label = activeThemeLabel;
     
-    // Fitur 5: Logika Penamaan Kustom
     if (label === "Kustom") {
         label = inputCustomName.value.trim() || "Kustom";
     }
@@ -151,12 +186,8 @@ btnAddQueue.addEventListener('click', () => {
     timerQueue.push({ label, minutes });
     updateQueueUI();
     
-    // Jika timer sedang kosong/berhenti, otomatis siapkan antrian pertama
     if (isPaused && !timerId && (!currentQueueItem || timeLeft === initialTimeForSession)) {
-        // Jangan langsung start, hanya update display utama jika belum jalan
         if (timerQueue.length > 0 && !timerId) {
-             // Opsional: Langsung ambil jika user ingin instan, tapi user minta update display besar saat "+"
-             // Kita biarkan startNextInQueue dipicu oleh Start atau jika kita ingin update display besar sekarang:
              const first = timerQueue.shift();
              currentQueueItem = first;
              timeLeft = first.minutes * 60;
@@ -179,14 +210,13 @@ function startTimer() {
             clearInterval(timerId);
             timerId = null;
             isPaused = true;
-            playNotificationSound();
-            startNextInQueue();
+            // Fitur 3: Tampilkan Modal & Alarm, jangan langsung lanjut
+            showAlarmModal();
         }
     }, 1000);
 }
 
 btnStart.addEventListener('click', () => {
-    // Fitur 1: Ambil nilai input HANYA saat Mulai ditekan (jika belum ada item aktif)
     if (!currentQueueItem || (isPaused && !timerId && timeLeft === initialTimeForSession && timerQueue.length === 0)) {
         const minutes = parseInt(inputMinutes.value) || 25;
         let label = activeThemeLabel;
@@ -210,18 +240,16 @@ btnPause.addEventListener('click', () => {
     btnPause.classList.add('hidden');
 });
 
-// Fitur 2: Reset Sesi
 btnReset.addEventListener('click', () => {
     clearInterval(timerId);
     timerId = null;
     isPaused = true;
-    timeLeft = initialTimeForSession; // Kembali ke waktu awal sesi ini
+    timeLeft = initialTimeForSession; 
     btnStart.classList.remove('hidden');
     btnPause.classList.add('hidden');
     updateDisplay();
 });
 
-// Fitur 2: Hapus (Trash)
 btnTrash.addEventListener('click', () => {
     clearInterval(timerId);
     timerId = null;
@@ -229,11 +257,9 @@ btnTrash.addEventListener('click', () => {
     btnStart.classList.remove('hidden');
     btnPause.classList.add('hidden');
     
-    // Langsung pindah ke antrian berikutnya
     if (timerQueue.length > 0) {
         startNextInQueue();
     } else {
-        // Jika antrian kosong, reset ke input
         currentQueueItem = null;
         const mins = parseInt(inputMinutes.value) || 25;
         timeLeft = mins * 60;
@@ -307,6 +333,67 @@ window.deleteTodo = (index) => {
     saveTodos();
     renderTodos();
 };
+
+
+// --- FITUR 2: KALKULATOR & CATATAN (BARU) ---
+
+// Kalkulator Logic
+const calcDisplay = document.getElementById('calc-display');
+let calcCurrent = '0';
+let calcPrev = '';
+let calcOpPending = null;
+
+function updateCalc() {
+    calcDisplay.textContent = calcCurrent;
+}
+
+window.calcNum = (num) => {
+    if (calcCurrent === '0' && num !== '.') {
+        calcCurrent = num;
+    } else {
+        calcCurrent += num;
+    }
+    updateCalc();
+};
+
+window.calcOp = (op) => {
+    calcPrev = calcCurrent;
+    calcCurrent = '0';
+    calcOpPending = op;
+    updateCalc();
+};
+
+window.calcClear = () => {
+    calcCurrent = '0';
+    calcPrev = '';
+    calcOpPending = null;
+    updateCalc();
+};
+
+window.calcEqual = () => {
+    if (!calcOpPending) return;
+    const a = parseFloat(calcPrev);
+    const b = parseFloat(calcCurrent);
+    let result = 0;
+    switch (calcOpPending) {
+        case '+': result = a + b; break;
+        case '-': result = a - b; break;
+        case '*': result = a * b; break;
+        case '/': result = a / b; break;
+    }
+    calcCurrent = result.toString();
+    calcOpPending = null;
+    updateCalc();
+};
+
+// Scratchpad Logic
+const scratchpad = document.getElementById('scratchpad');
+scratchpad.value = localStorage.getItem('fokusaja-scratchpad') || '';
+
+scratchpad.addEventListener('input', () => {
+    localStorage.setItem('fokusaja-scratchpad', scratchpad.value);
+});
+
 
 // Initial Render
 updateDisplay();

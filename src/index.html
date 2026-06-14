@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FokusAja - Pomodoro & To-Do List</title>
+    <!-- Fitur 1: Favicon Buku Biru (Inline SVG) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563eb'%3E%3Cpath d='M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.25a.75.75 0 0 0 1 .707A8.237 8.237 0 0 1 6 18.75c1.992 0 3.823.706 5.25 1.886V4.533ZM12.75 20.636A8.214 8.214 0 0 1 18 18.75c1.026 0 1.994.184 2.893.52a.75.75 0 0 0 1.007-.707V4.263a.75.75 0 0 0-.5-.707c-1.103-.368-2.29-.556-3.52-.556-2.022 0-3.87.712-5.32 1.905v15.73Z' /%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -38,6 +40,13 @@
         .mini-mode .mini-info-text {
             display: block;
         }
+        /* Custom styles for calculator buttons */
+        .calc-btn {
+            @apply p-3 bg-gray-100 rounded-lg font-bold hover:bg-gray-200 transition active:scale-95;
+        }
+        .calc-btn-op {
+            @apply bg-blue-50 text-blue-600 hover:bg-blue-100;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
@@ -48,114 +57,183 @@
         <p class="text-gray-500 mt-1">Tingkatkan produktivitasmu hari ini.</p>
     </header>
 
-    <main id="app-main" class="flex-grow container mx-auto px-4 py-8 max-w-2xl">
+    <main id="app-main" class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
         
-        <!-- Pomodoro Section -->
-        <section id="pomodoro-section" class="bg-white rounded-2xl shadow-sm border p-8 mb-8 text-center transition-all duration-300">
-            
-            <!-- Fitur 5: Tema & Kustomisasi Waktu (UPDATE) -->
-            <div class="hide-on-mini mb-6">
-                <div class="flex flex-wrap justify-center gap-2 mb-4">
-                    <button class="theme-btn px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold text-sm transition" data-time="25" data-label="Belajar">Belajar</button>
-                    <button class="theme-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200 transition" data-time="50" data-label="Kerja">Kerja</button>
-                    <button class="theme-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200 transition" data-time="5" data-label="Istirahat">Istirahat</button>
-                    <button class="theme-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200 transition" data-time="15" data-label="Bermain">Bermain</button>
-                    <button id="btn-custom-theme" class="theme-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200 transition" data-label="Kustom">Kustom</button>
-                </div>
-                
-                <div class="flex flex-col items-center space-y-3">
-                    <div class="flex items-center justify-center space-x-3">
-                        <div id="custom-name-container" class="hidden">
-                            <input type="text" id="input-custom-name" placeholder="Nama Sesi..." 
-                                class="px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 w-40 font-medium">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column: Timer & Utilities -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Pomodoro Section -->
+                <section id="pomodoro-section" class="bg-white rounded-2xl shadow-sm border p-8 text-center transition-all duration-300">
+                    
+                    <!-- Fitur 5: Tema & Kustomisasi Waktu (UPDATE) -->
+                    <div class="hide-on-mini mb-6">
+                        <div class="flex flex-wrap justify-center gap-2 mb-4">
+                            <button class="theme-btn px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold text-sm transition" data-time="25" data-label="Belajar">Belajar</button>
+                            <button class="theme-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200 transition" data-time="50" data-label="Kerja">Kerja</button>
+                            <button class="theme-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200 transition" data-time="5" data-label="Istirahat">Istirahat</button>
+                            <button class="theme-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200 transition" data-time="15" data-label="Bermain">Bermain</button>
+                            <button id="btn-custom-theme" class="theme-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200 transition" data-label="Kustom">Kustom</button>
                         </div>
-                        <div class="flex items-center bg-gray-100 rounded-xl px-4 py-2">
-                            <input type="number" id="input-minutes" value="25" min="1" max="999" 
-                                class="bg-transparent w-16 text-center font-bold text-xl focus:outline-none">
-                            <span class="text-gray-500 font-medium">menit</span>
+                        
+                        <div class="flex flex-col items-center space-y-3">
+                            <div class="flex items-center justify-center space-x-3">
+                                <div id="custom-name-container" class="hidden">
+                                    <input type="text" id="input-custom-name" placeholder="Nama Sesi..." 
+                                        class="px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 w-40 font-medium">
+                                </div>
+                                <div class="flex items-center bg-gray-100 rounded-xl px-4 py-2">
+                                    <input type="number" id="input-minutes" value="25" min="1" max="999" 
+                                        class="bg-transparent w-16 text-center font-bold text-xl focus:outline-none">
+                                    <span class="text-gray-500 font-medium">menit</span>
+                                </div>
+                                <button id="btn-add-queue" class="p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition shadow-sm" title="Tambah ke Antrian">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
-                        <button id="btn-add-queue" class="p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition shadow-sm" title="Tambah ke Antrian">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </div>
+
+                    <!-- Fitur 4: Info Mini Mode (BARU) -->
+                    <div class="mini-info-text mb-2 text-left px-2">
+                        <p id="mini-current-task" class="text-xs font-bold text-blue-600 truncate">Saat ini: Fokus</p>
+                        <p id="mini-next-task" class="text-[10px] text-gray-400 truncate">Berikutnya: -</p>
+                    </div>
+
+                    <div id="timer-display" class="text-8xl font-bold mb-8 timer-glow tabular-nums text-blue-600 transition-all">25:00</div>
+
+                    <div class="flex justify-center items-center space-x-4">
+                        <!-- Fitur 3: Play & Pause Icons (UPDATE) -->
+                        <button id="btn-start" class="p-4 bg-blue-600 text-white rounded-2xl shadow-lg hover:bg-blue-700 transition transform active:scale-95" title="Mulai">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
                             </svg>
                         </button>
+                        <button id="btn-pause" class="p-4 bg-gray-200 text-gray-700 rounded-2xl font-bold hover:bg-gray-300 transition hidden" title="Jeda">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+                                <path fill-rule="evenodd" d="M6.75 5.25a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0V6a.75.75 0 0 1 .75-.75ZM17.25 5.25a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0V6a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+
+                        <!-- Fitur 2: Reset & Trash Icons (UPDATE) -->
+                        <div class="flex items-center space-x-2 hide-on-mini">
+                            <button id="btn-reset" class="p-3 border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 transition" title="Reset Sesi">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                            </button>
+                            <button id="btn-trash" class="p-3 border border-gray-300 text-gray-400 rounded-xl hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition" title="Hapus Sesi & Lanjut">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Fitur 4: Minimize Icon (UPDATE) -->
+                        <button id="btn-minimize" class="p-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition" title="Mode Mini">
+                            <svg id="icon-minimize" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9V4.5M15 9h4.5M15 9l5.25-5.25M15 15v4.5M15 15h4.5m-4.5 0 5.25 5.25" />
+                            </svg>
+                            <svg id="icon-maximize" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75v4.5m0-4.5h-4.5m4.5 0L15 9m5.25 11.25v-4.5m0 4.5h-4.5m4.5 0-5.25-5.25" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Fitur 2: Tampilan Antrian -->
+                    <div id="queue-section" class="mt-8 pt-6 border-t hide-on-mini text-left hidden">
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center">
+                            <span class="mr-2">⏳</span> Antrian Fokus
+                        </h3>
+                        <ul id="queue-list" class="space-y-2">
+                            <!-- List antrian akan muncul di sini -->
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Fitur 2: Kalkulator & Catatan (BARU) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 hide-on-mini">
+                    <!-- Kalkulator -->
+                    <div class="bg-white rounded-2xl shadow-sm border p-6">
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center">
+                            <span class="mr-2">🧮</span> Kalkulator
+                        </h3>
+                        <div class="bg-gray-50 p-4 rounded-xl mb-4 text-right">
+                            <div id="calc-display" class="text-2xl font-bold text-gray-700 truncate">0</div>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="calcClear()" class="calc-btn calc-btn-op col-span-2">C</button>
+                            <button onclick="calcOp('/')" class="calc-btn calc-btn-op">÷</button>
+                            <button onclick="calcOp('*')" class="calc-btn calc-btn-op">×</button>
+                            
+                            <button onclick="calcNum('7')" class="calc-btn">7</button>
+                            <button onclick="calcNum('8')" class="calc-btn">8</button>
+                            <button onclick="calcNum('9')" class="calc-btn">9</button>
+                            <button onclick="calcOp('-')" class="calc-btn calc-btn-op">-</button>
+                            
+                            <button onclick="calcNum('4')" class="calc-btn">4</button>
+                            <button onclick="calcNum('5')" class="calc-btn">5</button>
+                            <button onclick="calcNum('6')" class="calc-btn">6</button>
+                            <button onclick="calcOp('+')" class="calc-btn calc-btn-op">+</button>
+                            
+                            <button onclick="calcNum('1')" class="calc-btn">1</button>
+                            <button onclick="calcNum('2')" class="calc-btn">2</button>
+                            <button onclick="calcNum('3')" class="calc-btn">3</button>
+                            <button onclick="calcEqual()" class="calc-btn bg-blue-600 text-white hover:bg-blue-700 row-span-2">=</button>
+                            
+                            <button onclick="calcNum('0')" class="calc-btn col-span-2">0</button>
+                            <button onclick="calcNum('.')" class="calc-btn">.</button>
+                        </div>
+                    </div>
+
+                    <!-- Scratchpad -->
+                    <div class="bg-white rounded-2xl shadow-sm border p-6 flex flex-col">
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center">
+                            <span class="mr-2">💡</span> Catatan Cepat
+                        </h3>
+                        <textarea id="scratchpad" placeholder="Tulis ide atau pikiranmu di sini agar tidak mengganggu fokus..." 
+                            class="flex-grow w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-blue-500 resize-none text-sm leading-relaxed text-gray-700"></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- Fitur 4: Info Mini Mode (BARU) -->
-            <div class="mini-info-text mb-2 text-left px-2">
-                <p id="mini-current-task" class="text-xs font-bold text-blue-600 truncate">Saat ini: Fokus</p>
-                <p id="mini-next-task" class="text-[10px] text-gray-400 truncate">Berikutnya: -</p>
+            <!-- Right Column: To-Do List -->
+            <div class="space-y-8">
+                <!-- To-Do List Section -->
+                <section id="todo-section" class="bg-white rounded-2xl shadow-sm border p-8 sticky top-8">
+                    <h2 class="text-xl font-bold mb-6 flex items-center">
+                        <span class="mr-2">📝</span> Daftar Tugas
+                    </h2>
+                    
+                    <form id="todo-form" class="flex flex-col gap-2 mb-6">
+                        <input type="text" id="todo-input" placeholder="Apa yang ingin dikerjakan?" 
+                            class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <button type="submit" class="w-full px-6 py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition">Tambah</button>
+                    </form>
+
+                    <ul id="todo-list" class="space-y-3"></ul>
+                </section>
             </div>
-
-            <div id="timer-display" class="text-8xl font-bold mb-8 timer-glow tabular-nums text-blue-600 transition-all">25:00</div>
-
-            <div class="flex justify-center items-center space-x-4">
-                <!-- Fitur 3: Play & Pause Icons (UPDATE) -->
-                <button id="btn-start" class="p-4 bg-blue-600 text-white rounded-2xl shadow-lg hover:bg-blue-700 transition transform active:scale-95" title="Mulai">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
-                        <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
-                    </svg>
-                </button>
-                <button id="btn-pause" class="p-4 bg-gray-200 text-gray-700 rounded-2xl font-bold hover:bg-gray-300 transition hidden" title="Jeda">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
-                        <path fill-rule="evenodd" d="M6.75 5.25a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0V6a.75.75 0 0 1 .75-.75ZM17.25 5.25a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0V6a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
-                    </svg>
-                </button>
-
-                <!-- Fitur 2: Reset & Trash Icons (UPDATE) -->
-                <div class="flex items-center space-x-2 hide-on-mini">
-                    <button id="btn-reset" class="p-3 border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 transition" title="Reset Sesi">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                    </button>
-                    <button id="btn-trash" class="p-3 border border-gray-300 text-gray-400 rounded-xl hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition" title="Hapus Sesi & Lanjut">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                </div>
-                
-                <!-- Fitur 4: Minimize Icon (UPDATE) -->
-                <button id="btn-minimize" class="p-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition" title="Mode Mini">
-                    <svg id="icon-minimize" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9V4.5M15 9h4.5M15 9l5.25-5.25M15 15v4.5M15 15h4.5m-4.5 0 5.25 5.25" />
-                    </svg>
-                    <svg id="icon-maximize" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75v4.5m0-4.5h-4.5m4.5 0L15 9m5.25 11.25v-4.5m0 4.5h-4.5m4.5 0-5.25-5.25" />
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Fitur 2: Tampilan Antrian -->
-            <div id="queue-section" class="mt-8 pt-6 border-t hide-on-mini text-left hidden">
-                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center">
-                    <span class="mr-2">⏳</span> Antrian Fokus
-                </h3>
-                <ul id="queue-list" class="space-y-2">
-                    <!-- List antrian akan muncul di sini -->
-                </ul>
-            </div>
-        </section>
-
-        <!-- To-Do List Section -->
-        <section id="todo-section" class="bg-white rounded-2xl shadow-sm border p-8">
-            <h2 class="text-xl font-bold mb-6 flex items-center">
-                <span class="mr-2">📝</span> Daftar Tugas
-            </h2>
-            
-            <form id="todo-form" class="flex gap-2 mb-6">
-                <input type="text" id="todo-input" placeholder="Apa yang ingin kamu kerjakan?" 
-                    class="flex-grow px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition">Tambah</button>
-            </form>
-
-            <ul id="todo-list" class="space-y-3"></ul>
-        </section>
+        </div>
 
     </main>
+
+    <!-- Fitur 3: Custom Modal Notifikasi (BARU) -->
+    <div id="alarm-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full mx-4 shadow-2xl transform scale-95 transition-transform duration-300 text-center">
+            <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Waktu Habis!</h2>
+            <p id="modal-message" class="text-gray-500 mb-8">Sesi fokus Anda telah selesai. Saatnya beristirahat atau lanjut ke sesi berikutnya.</p>
+            <button id="btn-modal-ok" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-lg hover:bg-blue-700 transition shadow-lg active:scale-95">
+                Siap, Lanjutkan!
+            </button>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer id="app-footer" class="bg-white border-t py-6 text-center text-gray-400 text-sm">
